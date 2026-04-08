@@ -1,0 +1,29 @@
+﻿@model List<Empleado>
+
+<h1 style="color:red">
+    Compis
+</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id Empleado</th>
+            <th>Apellido</th>
+            <th>Oficio</th>
+            <th>Salario</th>
+            <th>Id departamento</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Empleado emp in Model)
+        {
+            <tr>
+                <td>@emp.idEmpleado</td>
+                <td>@emp.Apellido</td>
+                <td>@emp.Oficio</td>
+                <td>@emp.Salario</td>
+                <td>@emp.idDepartamento</td>
+            </tr>
+        }
+    </tbody>
+</table>

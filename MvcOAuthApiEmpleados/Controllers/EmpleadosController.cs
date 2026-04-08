@@ -32,11 +32,15 @@ namespace MvcOAuthApiEmpleados.Controllers
         [AuthorizeEmpleados]
         public async Task<IActionResult> PerfilEmpleado()
         {
-            //Necesitamos buscar el empleado con su claim y name identifier
-            var data = HttpContext.User.FindFirst(z => z.Type == ClaimTypes.NameIdentifier).Value;
-            int idEmpleado = int.Parse(data);
-            Empleado emp = await this.service.FindEmpleadoAsync(idEmpleado);
+            Empleado emp = await this.service.GetPerfilAsync();
             return View(emp);
+        }
+
+        [AuthorizeEmpleados]
+        public async Task<IActionResult> Compis()
+        {
+            List<Empleado> empleados = await this.service.GetCompisAsync();
+            return View(empleados);
         }
     }
 }

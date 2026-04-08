@@ -1,4 +1,5 @@
-﻿using ApiOAuthEmpleados.Models;
+﻿using ApiOAuthEmpleados.Helpers;
+using ApiOAuthEmpleados.Models;
 using ApiOAuthEmpleados.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,10 +14,12 @@ namespace ApiOAuthEmpleados.Controllers
     public class EmpleadosController : ControllerBase
     {
         private RepositoryHospital repo;
+        private IConfiguration configuration;
 
-        public EmpleadosController(RepositoryHospital repo)
+        public EmpleadosController(RepositoryHospital repo, IConfiguration configuration)
         {
             this.repo = repo;
+            this.configuration = configuration;
         }
 
         [HttpGet]
@@ -38,7 +41,9 @@ namespace ApiOAuthEmpleados.Controllers
         public async Task<ActionResult<Empleado>> Perfil()
         {
             Claim claim = HttpContext.User.FindFirst(z => z.Type == "UserData");
-            string jsonEmpleado = claim.Value;
+            string jsonEncriptado = claim.Value;
+            string secretKey = this.configuration.GetValue<string>("ConfiguracionCifrado:LlaveSecreta");
+            string jsonEmpleado = HelperCifrado.DecryptString(secretKey, jsonEncriptado);
             Empleado empleado = JsonConvert.DeserializeObject<Empleado>(jsonEmpleado);
             return await this.repo.FindEmpleadoAsync(empleado.idEmpleado);
         }
@@ -49,7 +54,9 @@ namespace ApiOAuthEmpleados.Controllers
         public async Task<ActionResult<List<Empleado>>> Compis()
         {
             Claim claim = HttpContext.User.FindFirst(z => z.Type == "UserData");
-            string jsonEmpleado = claim.Value;
+            string jsonEncriptado = claim.Value;
+            string secretKey = this.configuration.GetValue<string>("ConfiguracionCifrado:LlaveSecreta");
+            string jsonEmpleado = HelperCifrado.DecryptString(secretKey, jsonEncriptado);
             Empleado empleado = JsonConvert.DeserializeObject<Empleado>(jsonEmpleado);
             return await this.repo.GetCompisAsync(empleado.idDepartamento);
         }
