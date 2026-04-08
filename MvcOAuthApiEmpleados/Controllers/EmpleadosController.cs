@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MvcOAuthApiEmpleados.Filters;
 using MvcOAuthApiEmpleados.Models;
 using MvcOAuthApiEmpleados.Services;
+using System.Security.Claims;
 
 namespace MvcOAuthApiEmpleados.Controllers
 {
@@ -13,26 +15,28 @@ namespace MvcOAuthApiEmpleados.Controllers
             this.service = service;
         }
 
+        [AuthorizeEmpleados]
         public async Task<IActionResult> Index()
         {
             List<Empleado> empleados = await this.service.GetEmpleadosAsync();
             return View(empleados);
         }
 
+        [AuthorizeEmpleados]
         public async Task<IActionResult> Details(int idEmpleado)
         {
-            //Tendremos el token en session
-            string token = HttpContext.Session.GetString("TOKEN");
-            if (token == null)
-            {
-                ViewData["MENSAJE"] = "Debe hacer Log In";
-                return View();
-            }
-            else
-            {
-                Empleado empleado = await this.service.FindEmpleadoAsync(idEmpleado, token);
-                return View(empleado);
-            }
+            Empleado empleado = await this.service.FindEmpleadoAsync(idEmpleado);
+            return View(empleado);
+        }
+
+        [AuthorizeEmpleados]
+        public async Task<IActionResult> PerfilEmpleado()
+        {
+            //Necesitamos buscar el empleado con su claim y name identifier
+            var data = HttpContext.User.FindFirst(z => z.Type == ClaimTypes.NameIdentifier).Value;
+            int idEmpleado = int.Parse(data);
+            Empleado emp = await this.service.FindEmpleadoAsync(idEmpleado);
+            return View(emp);
         }
     }
 }

@@ -11,11 +11,13 @@ namespace MvcOAuthApiEmpleados.Services
     {
         private string UrlApi;
         private MediaTypeWithQualityHeaderValue header;
+        private IHttpContextAccessor contextAccessor;
         
-        public ServiceEmpleados(IConfiguration configuration)
+        public ServiceEmpleados(IConfiguration configuration, IHttpContextAccessor contextAccessor)
         {
             this.UrlApi = configuration.GetValue<string>("ApiUrls:ApiEmpleados");
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
+            this.contextAccessor = contextAccessor;
         }
 
         public async Task<string> LogInAsync(string user, string pass)
@@ -99,12 +101,28 @@ namespace MvcOAuthApiEmpleados.Services
             return empleados;
         }
 
-        //Por ahora recibiremos el token en el metodo.
-        public async Task<Empleado> FindEmpleadoAsync(int idEmpleado, string token)
+        public async Task<Empleado> FindEmpleadoAsync(int idEmpleado)
         {
             string request = "api/Empleados/" + idEmpleado;
+            string token = this.contextAccessor.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
             Empleado empleado = await this.CallApiAsync<Empleado>(request, token);
             return empleado;
+        }
+
+        public async Task<Empleado> GetPerfilAsync()
+        {
+            string request = "api/Empleados/Perfil";
+            string token = this.contextAccessor.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+            Empleado empleado = await this.CallApiAsync<Empleado>(request, token);
+            return empleado;
+        }
+
+        public async Task<List<Empleado>> GetCompisAsync()
+        {
+            string request = "api/Empleados/Compis";
+            string token = this.contextAccessor.HttpContext.User.FindFirst(x => x.Type == "TOKEN").Value;
+            List<Empleado> empleados = await this.CallApiAsync<List<Empleado>>(request, token);
+            return empleados;
         }
     }
 }

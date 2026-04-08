@@ -39,6 +39,7 @@ namespace MvcOAuthApiEmpleados.Controllers
                 identity.AddClaim(new Claim(ClaimTypes.Name, model.UserName));
                 //Almacenamos el password del usuario como identifier.
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, model.Password));
+                identity.AddClaim(new Claim("TOKEN", token));
                 ClaimsPrincipal principal = new ClaimsPrincipal(identity);
                 //Damos de alta al usuario durante 20 minutos
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
