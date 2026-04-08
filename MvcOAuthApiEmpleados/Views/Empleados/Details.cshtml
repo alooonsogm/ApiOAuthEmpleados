@@ -1,0 +1,33 @@
+﻿@model Empleado
+
+@if (Model == null)
+{
+    <h2 style="color:red">No estas Logueado!!</h2>
+}
+else
+{
+    <h1 style="color:red">
+        Details Empleado
+    </h1>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Id Empleado</th>
+                <th>Apellido</th>
+                <th>Oficio</th>
+                <th>Salario</th>
+                <th>Id departamento</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.idEmpleado</td>
+                <td>@Model.Apellido</td>
+                <td>@Model.Oficio</td>
+                <td>@Model.Salario</td>
+                <td>@Model.idDepartamento</td>
+            </tr>
+        </tbody>
+    </table>
+}

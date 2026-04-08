@@ -94,7 +94,7 @@ namespace MvcOAuthApiEmpleados.Services
 
         public async Task<List<Empleado>> GetEmpleadosAsync()
         {
-            string request = "/api/Empleados​";
+            string request = "api/Empleados";
             List<Empleado> empleados = await this.CallApiAsync<List<Empleado>>(request);
             return empleados;
         }
@@ -102,7 +102,7 @@ namespace MvcOAuthApiEmpleados.Services
         //Por ahora recibiremos el token en el metodo.
         public async Task<Empleado> FindEmpleadoAsync(int idEmpleado, string token)
         {
-            string request = "/api/Empleados/​" + idEmpleado;
+            string request = "api/Empleados/" + idEmpleado;
             Empleado empleado = await this.CallApiAsync<Empleado>(request, token);
             return empleado;
         }

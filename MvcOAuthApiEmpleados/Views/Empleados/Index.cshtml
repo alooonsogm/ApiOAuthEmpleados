@@ -1,0 +1,37 @@
+﻿@model List<Empleado>
+
+<h1 style="color:red">
+    Empleados
+</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id Empleado</th>
+            <th>Apellido</th>
+            <th>Oficio</th>
+            <th>Salario</th>
+            <th>Id departamento</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Empleado emp in Model)
+        {
+            <tr>
+                <td>@emp.idEmpleado</td>
+                <td>@emp.Apellido</td>
+                <td>@emp.Oficio</td>
+                <td>@emp.Salario</td>
+                <td>@emp.idDepartamento</td>
+                <td>
+                    <a asp-controller="Empleados" asp-action="Details" asp-route-idEmpleado="@emp.idEmpleado" class="btn btn-primary">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2 style="color:blue">
+    @ViewData["MENSAJE"]
+</h2>
