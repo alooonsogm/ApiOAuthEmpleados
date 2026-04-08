@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ApiOAuthEmpleados/ApiOAuthEmpleados.csproj" />
+  <Project Path="ClienteApiOAuthEmpleados/ClienteApiOAuthEmpleados.csproj" />
+  <Project Path="MvcOAuthApiEmpleados/MvcOAuthApiEmpleados.csproj" Id="79978187-7abe-4ae5-884e-1eb3ac3ec862" />
+</Solution>
