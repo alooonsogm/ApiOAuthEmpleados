@@ -5,59 +5,72 @@ namespace ApiOAuthEmpleados.Helpers
 {
     public static class HelperCifrado
     {
-        public static string EncryptString(string keyString, string plainText)
+        private static string KeyCifrado;
+
+        public static void Initialize(IConfiguration configuration)
         {
-            // Convertimos tu string de 32 caracteres a un array de 32 bytes
-            byte[] key = Encoding.UTF8.GetBytes(keyString);
+            KeyCifrado = configuration.GetValue<string>("ConfiguracionCifrado:LlaveSecreta");
+        }
+
+        public static string CifrarString(string data)
+        {
+            //Convertimos a Bytes la key
+            byte[] keyData = Encoding.UTF8.GetBytes(KeyCifrado);
+            string res = EncryptString(keyData, data);
+            return res;
+        }
+
+        public static string DescifrarString(string data)
+        {
+            //Convertimos a Bytes la key
+            byte[] keyData = Encoding.UTF8.GetBytes(KeyCifrado);
+            string res = DecryptString(keyData, data);
+            return res;
+        }
+
+        private static string EncryptString(byte[] key, string plainText)
+        {
+            byte[] iv = new byte[16];
+            byte[] array;
 
             using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
-                aes.GenerateIV(); // Genera un IV aleatorio y seguro para cada cifrado
+                aes.IV = iv;
 
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    // Escribimos el IV al principio del stream para no perderlo
-                    memoryStream.Write(aes.IV, 0, aes.IV.Length);
-
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, encryptor, CryptoStreamMode.Write))
                     {
-                        using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                        using (StreamWriter streamWriter = new StreamWriter((Stream)cryptoStream))
                         {
                             streamWriter.Write(plainText);
                         }
+                        array = memoryStream.ToArray();
                     }
-
-                    // Retornamos todo (IV + Texto cifrado) en formato Base64
-                    return Convert.ToBase64String(memoryStream.ToArray());
                 }
             }
+            return Convert.ToBase64String(array);
         }
 
-        public static string DecryptString(string keyString, string cipherText)
+        private static string DecryptString(byte[] key, string cipherText)
         {
-            byte[] key = Encoding.UTF8.GetBytes(keyString);
-            byte[] fullCipher = Convert.FromBase64String(cipherText);
+            byte[] iv = new byte[16];
+            byte[] buffer = Convert.FromBase64String(cipherText);
 
             using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
-
-                // Extraemos los primeros 16 bytes, que corresponden al IV aleatorio que guardamos
-                byte[] iv = new byte[16];
-                Array.Copy(fullCipher, 0, iv, 0, iv.Length);
                 aes.IV = iv;
-
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-                // Leemos el resto del stream (saltándonos los 16 bytes del IV)
-                using (MemoryStream memoryStream = new MemoryStream(fullCipher, iv.Length, fullCipher.Length - iv.Length))
+                using (MemoryStream memoryStream = new MemoryStream(buffer))
                 {
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, decryptor, CryptoStreamMode.Read))
                     {
-                        using (StreamReader streamReader = new StreamReader(cryptoStream))
+                        using (StreamReader streamReader = new StreamReader((Stream)cryptoStream))
                         {
                             return streamReader.ReadToEnd();
                         }

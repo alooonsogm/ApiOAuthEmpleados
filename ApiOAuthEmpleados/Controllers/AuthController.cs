@@ -39,13 +39,25 @@ namespace ApiOAuthEmpleados.Controllers
             {
                 //Debemos crear unas credenciales con nuestro token
                 SigningCredentials credentials = new SigningCredentials(this.helper.GetKeyToken(), SecurityAlgorithms.HmacSha256);
-                string jsonEmpleado = JsonConvert.SerializeObject(empleado);
-                string secretKey = this.configuration.GetValue<string>("ConfiguracionCifrado:LlaveSecreta");
-                string jsonEncriptado = HelperCifrado.EncryptString(secretKey, jsonEmpleado);
+
+                //Creamos nuestro ModeloEmpleado para almacenar lo datos que se necesitan en el token.
+                EmpleadoModel modelEmp = new EmpleadoModel
+                {
+                    idEmpleado = empleado.idEmpleado,
+                    Apellido = empleado.Apellido,
+                    Oficio = empleado.Oficio,
+                    Salario = empleado.Salario,
+                    idDepartamento = empleado.idDepartamento
+                };
+
+                string jsonEmpleado = JsonConvert.SerializeObject(modelEmp);
+                string jsonCifrado = HelperCifrado.CifrarString(jsonEmpleado);
                 //Creamos un array de Claims, que es lo que se guarda en el token (se puede toda la info que nos apetezca)
+                //Aqui almacenamos el rol del usuario.
                 Claim[] informacion = new[]
                 {
-                    new Claim("UserData", jsonEncriptado)
+                    new Claim("UserData", jsonCifrado),
+                    new Claim(ClaimTypes.Role, empleado.Oficio)
                 };
                 //El token se genera con una clase y debemos almacenar los datos de issuer, credentials...
                 JwtSecurityToken token = new JwtSecurityToken(

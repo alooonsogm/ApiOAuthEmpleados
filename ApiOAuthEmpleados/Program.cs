@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<HelperEmpleadoToken>();
+HelperCifrado.Initialize(builder.Configuration);
 //Creamos una instancia de nuestro helper.
 HelperActionOAuthService helper = new HelperActionOAuthService(builder.Configuration);
 //Esta instancia solamente debemos crearla una vez
